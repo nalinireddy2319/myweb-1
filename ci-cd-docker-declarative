@@ -11,16 +11,16 @@ pipeline{
         }
         stage('Docker Build'){
             steps{
-                sh "docker build . -t kammana/mywebapp:${dockerTag()}"
+                sh "docker build . -t sitharam321/mywebapp:${dockerTag()}"
             }
         }
         stage('DockerHub Push Image'){
             steps{
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerPwd')]) {
-                    sh "docker login -u kammana -p ${dockerPwd}"
+                    sh "docker login -u sitharam321 -p ${dockerPwd}"
                 }
                 
-                sh "docker push kammana/mywebapp:${dockerTag()}"
+                sh "docker push sitharam321/mywebapp:${dockerTag()}"
             }
         }
         stage('Docker Deploy Dev'){
@@ -28,9 +28,9 @@ pipeline{
                 sshagent(['docker-host-dev']) {
                     script{
                         def dkrRun = "docker run -d -p 8080:8080 --name mywebapp kammana/mywebapp:${dockerTag()}"
-                        sh script: "ssh -o StrictHostKeyChecking=no ec2-user@172.31.47.245 docker rm -f mywebapp",
+                        sh script: "ssh -o StrictHostKeyChecking=no ec2-user@172.31.32.54 docker rm -f mywebapp",
 			   returnStatus: true
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.47.245 ${dkrRun}"
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.32.54 ${dkrRun}"
                     }
                 }
             }
